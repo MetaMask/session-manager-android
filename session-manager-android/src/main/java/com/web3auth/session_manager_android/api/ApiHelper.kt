@@ -14,8 +14,6 @@ import java.util.concurrent.TimeUnit
 
 object ApiHelper {
 
-    private const val baseUrl = "https://session.web3auth.io"
-
     private val okHttpClient = OkHttpClient().newBuilder()
         .readTimeout(60, TimeUnit.SECONDS)
         .connectTimeout(20, TimeUnit.SECONDS)
@@ -28,12 +26,28 @@ object ApiHelper {
 
     private val builder = GsonBuilder().disableHtmlEscaping().create()
 
-    fun getInstance(): Retrofit {
-        return Retrofit.Builder().baseUrl(baseUrl)
+    /**
+     * Creates a Retrofit client for the given session server base URL.
+     * Each StorageManager instance should use its own client — there is no singleton base URL.
+     */
+    fun getInstance(sessionServerBaseUrl: String): Retrofit {
+        val baseUrl = if (sessionServerBaseUrl.endsWith("/")) {
+            sessionServerBaseUrl
+        } else {
+            "$sessionServerBaseUrl/"
+        }
+        return Retrofit.Builder()
+            .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create(builder))
             .client(okHttpClient)
             .build()
     }
+
+    fun getWeb3AuthApi(sessionServerBaseUrl: String): Web3AuthApi {
+        return getInstance(sessionServerBaseUrl).create(Web3AuthApi::class.java)
+    }
+
+    fun defaultOkHttpClient(): OkHttpClient = okHttpClient
 
     fun isNetworkAvailable(context: Context?): Boolean {
         if (context == null) return false
