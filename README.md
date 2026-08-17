@@ -4,7 +4,7 @@
 
 > Web3Auth is where passwordless auth meets non-custodial key infrastructure for Web3 apps and wallets. By aggregating OAuth (Google, Twitter, Discord) logins, different wallets and innovative Multi Party Computation (MPC) - Web3Auth provides a seamless login experience to every user on your application.
 
-Torus Session Manager Android is at parity with [`@toruslabs/session-manager` v5.6.0](https://www.npmjs.com/package/@toruslabs/session-manager). It provides two modules:
+Torus Session Manager Android creates, authorizes, updates, and invalidates encrypted sessions, and manages access/refresh tokens with authenticated HTTP. It provides two modules:
 
 1. **Storage Manager** — legacy encrypted metadata storage with a server-backed hex session ID.
 2. **Auth Session Manager** — token-based sessions with automatic refresh and an authenticated HTTP client.
