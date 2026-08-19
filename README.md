@@ -28,7 +28,7 @@ repositories {
   maven { url "https://jitpack.io" }
 }
 dependencies {
-  implementation 'com.github.web3auth:session-manager-android:5.0.0'
+  implementation 'com.github.web3auth:session-manager-android:4.0.0'
 }
 ```
 
