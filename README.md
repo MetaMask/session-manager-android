@@ -113,7 +113,7 @@ By default, session ID / access token / ID token and the refresh token are store
 
 ## Migration from SessionManager (v3)
 
-| v3 | v5 |
+| v3 | v4 |
 | --- | --- |
 | `SessionManager` | `StorageManager` |
 | Hardcoded `https://session.web3auth.io` | Required `sessionServerBaseUrl` |
@@ -123,7 +123,7 @@ By default, session ID / access token / ID token and the refresh token are store
 
 `SessionManager` remains as a `@Deprecated` subclass of `StorageManager` and also requires `sessionServerBaseUrl`.
 
-Default session timeout is **86400 seconds** (1 day), matching web v5. The previous Android default was 30 days.
+Default session timeout is **86400 seconds** (1 day). The previous Android default was 30 days.
 
 `generateRandomSessionKey()` now returns a `0x`-prefixed 64-character hex string.
 
