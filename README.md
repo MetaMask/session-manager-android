@@ -64,10 +64,10 @@ val storage = StorageManager(
     useLocalStorage = true
 )
 
-storage.createSession("""{"userId":"123"}""", this).get()
-val sessionData = storage.authorizeSession(packageName, this).get()
-storage.updateSession("""{"userId":"123","role":"admin"}""", this).get()
-storage.invalidateSession(this).get()
+storage.createSession("""{"userId":"123"}""").get()
+val sessionData = storage.authorizeSession().get()
+storage.updateSession("""{"userId":"123","role":"admin"}""").get()
+storage.invalidateSession().get()
 ```
 
 ## Auth Session Manager

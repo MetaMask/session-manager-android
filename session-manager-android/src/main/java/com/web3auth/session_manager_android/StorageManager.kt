@@ -116,15 +116,11 @@ open class StorageManager private constructor(
      * Creates a new encrypted session on the session server.
      *
      * @param data Session payload as a JSON string.
-     * @param context Used for connectivity checks. Defaults to the constructor context.
      */
-    override fun createSession(
-        data: String,
-        context: Context?
-    ): CompletableFuture<String> {
+    override fun createSession(data: String): CompletableFuture<String> {
         return future {
             checkSessionParams()
-            ensureNetwork(context)
+            ensureNetwork()
             val id = sessionId!!
             serverHandler.storeData(
                 id,
@@ -144,11 +140,9 @@ open class StorageManager private constructor(
     /**
      * Authorizes the current session. Checks the local cache first when
      * [useLocalStorage] is enabled, then falls back to the session server.
+     * Uses [allowedOrigin] from the constructor for the request origin header.
      */
-    override fun authorizeSession(
-        origin: String,
-        context: Context?
-    ): CompletableFuture<String> {
+    override fun authorizeSession(): CompletableFuture<String> {
         return future {
             checkSessionParams()
             val id = sessionId!!
@@ -156,12 +150,12 @@ open class StorageManager private constructor(
             if (localData != null) {
                 return@future localData
             }
-            ensureNetwork(context)
+            ensureNetwork()
             val response = serverHandler.retrieveData(
                 id,
                 StorageHandlerRetrieveOptions(
                     namespace = sessionNamespace,
-                    origin = origin
+                    origin = allowedOrigin.takeIf { it.isNotEmpty() && it != "*" }
                 )
             ) ?: throw Exception("Session Expired or Invalid public key")
             safeLocalStorageOp { handler -> handler.storeData(id, response) }
@@ -172,13 +166,10 @@ open class StorageManager private constructor(
     /**
      * Updates an existing session via PUT /v2/store/update.
      */
-    override fun updateSession(
-        data: String,
-        context: Context?
-    ): CompletableFuture<Unit> {
+    override fun updateSession(data: String): CompletableFuture<Unit> {
         return future {
             checkSessionParams()
-            ensureNetwork(context)
+            ensureNetwork()
             val id = sessionId!!
             serverHandler.storeData(
                 id,
@@ -196,10 +187,10 @@ open class StorageManager private constructor(
     /**
      * Invalidates the current session (timeout: 1) and clears local cache.
      */
-    override fun invalidateSession(context: Context?): CompletableFuture<Boolean> {
+    override fun invalidateSession(): CompletableFuture<Boolean> {
         return future {
             checkSessionParams()
-            ensureNetwork(context)
+            ensureNetwork()
             val id = sessionId!!
             serverHandler.storeData(
                 id,
@@ -250,7 +241,7 @@ open class StorageManager private constructor(
         return localStorageHandler
     }
 
-    private fun ensureNetwork(context: Context?) {
+    private fun ensureNetwork() {
         if (skipNetworkCheck) return
         if (!ApiHelper.isNetworkAvailable(context)) {
             throw Exception(SessionManagerError.getError(ErrorCode.RUNTIME_ERROR))

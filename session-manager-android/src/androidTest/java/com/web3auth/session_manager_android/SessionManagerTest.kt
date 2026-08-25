@@ -36,10 +36,7 @@ class SessionManagerTest {
             "91714924788458331086143283967892938475657483928374623640418082526960471979197446884"
         )
         json.put("publicAddress", "0x93475c78dv0jt80f2b6715a5c53838eC4aC96EF7")
-        val sessionKey = storageManager.createSession(
-            json.toString(),
-            context
-        ).get()
+        val sessionKey = storageManager.createSession(json.toString()).get()
         assert(sessionKey.isNotEmpty())
     }
 
@@ -62,16 +59,10 @@ class SessionManagerTest {
             "91714924788458331086143283967892938475657483928374623640418082526960471979197446884"
         )
         json.put("publicAddress", "0x93475c78dv0jt80f2b6715a5c53838eC4aC96EF7")
-        val created = storageManager.createSession(
-            json.toString(),
-            context
-        ).get()
+        val created = storageManager.createSession(json.toString()).get()
         StorageManager.saveSessionIdToStorage(created)
         assertTrue(created.isNotEmpty())
-        val authResponse = storageManager.authorizeSession(
-            context.packageName,
-            context
-        ).get()
+        val authResponse = storageManager.authorizeSession().get()
         val resp = JSONObject(authResponse)
         assert(resp.get("privateKey").toString().isNotEmpty())
         assert(resp.get("publicAddress").toString().isNotEmpty())
@@ -95,12 +86,9 @@ class SessionManagerTest {
             "91714924788458331086143283967892938475657483928374623640418082526960471979197446884"
         )
         json.put("publicAddress", "0x93475c78dv0jt80f2b6715a5c53838eC4aC96EF7")
-        val created = storageManager.createSession(
-            json.toString(),
-            context
-        ).get()
+        val created = storageManager.createSession(json.toString()).get()
         StorageManager.saveSessionIdToStorage(created)
-        val invalidateRes = storageManager.invalidateSession(context).get()
+        val invalidateRes = storageManager.invalidateSession().get()
         assertEquals(invalidateRes, true)
         StorageManager.deleteSessionIdFromStorage()
         val res = StorageManager.getSessionIdFromStorage().isNotEmpty()
@@ -122,15 +110,15 @@ class SessionManagerTest {
         val createdPayload = JSONObject()
             .put("publicAddress", "0x93475c78dv0jt80f2b6715a5c53838eC4aC96EF7")
             .put("privateKey", "1")
-        storageManager.createSession(createdPayload.toString(), context).get()
+        storageManager.createSession(createdPayload.toString()).get()
 
         val updatedPayload = JSONObject()
             .put("publicAddress", "0x1111111111111111111111111111111111111111")
             .put("privateKey", "2")
             .put("updated", true)
-        storageManager.updateSession(updatedPayload.toString(), context).get()
+        storageManager.updateSession(updatedPayload.toString()).get()
 
-        val authResponse = storageManager.authorizeSession(context.packageName, context).get()
+        val authResponse = storageManager.authorizeSession().get()
         val resp = JSONObject(authResponse)
         assertEquals("0x1111111111111111111111111111111111111111", resp.getString("publicAddress"))
         assertEquals("2", resp.getString("privateKey"))

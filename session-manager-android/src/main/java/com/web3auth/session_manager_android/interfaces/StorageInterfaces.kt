@@ -1,6 +1,5 @@
 package com.web3auth.session_manager_android.interfaces
 
-import android.content.Context
 import java.util.concurrent.CompletableFuture
 
 const val SESSION_SERVER_API_URL = "https://api.web3auth.io/session-service"
@@ -8,10 +7,10 @@ const val DEFAULT_SESSION_TIMEOUT = 86400
 const val DEFAULT_LOCAL_STORAGE_NAMESPACE = "w3a_session_manager_default"
 
 interface IStorageManager {
-    fun createSession(data: String, context: Context?): CompletableFuture<String>
-    fun authorizeSession(origin: String, context: Context?): CompletableFuture<String>
-    fun updateSession(data: String, context: Context?): CompletableFuture<Unit>
-    fun invalidateSession(context: Context?): CompletableFuture<Boolean>
+    fun createSession(data: String): CompletableFuture<String>
+    fun authorizeSession(): CompletableFuture<String>
+    fun updateSession(data: String): CompletableFuture<Unit>
+    fun invalidateSession(): CompletableFuture<Boolean>
 }
 
 enum class StorageOperation {

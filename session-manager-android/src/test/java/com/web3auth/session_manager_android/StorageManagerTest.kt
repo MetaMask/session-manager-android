@@ -88,7 +88,7 @@ class StorageManagerTest {
             serverHandler = server,
             localStorageHandler = local
         )
-        val result = manager.createSession("""{"user":"1"}""", null).get()
+        val result = manager.createSession("""{"user":"1"}""").get()
         assertEquals(manager.sessionId, result)
         assertEquals(listOf(StorageOperation.CREATE), server.operations)
         assertEquals("""{"user":"1"}""", server.stored[manager.sessionId])
@@ -107,7 +107,7 @@ class StorageManagerTest {
             localStorageHandler = local
         )
         runBlocking { local.storeData(manager.sessionId!!, """{"cached":true}""") }
-        val result = manager.authorizeSession("origin", null).get()
+        val result = manager.authorizeSession().get()
         assertEquals("""{"cached":true}""", result)
         assertTrue(server.stored.isEmpty())
     }
@@ -124,7 +124,7 @@ class StorageManagerTest {
             localStorageHandler = local
         )
         server.stored[manager.sessionId!!] = """{"from":"server"}"""
-        val result = manager.authorizeSession("origin", null).get()
+        val result = manager.authorizeSession().get()
         assertEquals("""{"from":"server"}""", result)
         assertEquals("""{"from":"server"}""", runBlocking { local.retrieveData(manager.sessionId!!) })
     }
@@ -142,7 +142,7 @@ class StorageManagerTest {
         )
         map.setItem(local.getStorageKey(manager.sessionId!!), "{{{{")
         server.stored[manager.sessionId!!] = """{"recovered":true}"""
-        val result = manager.authorizeSession("origin", null).get()
+        val result = manager.authorizeSession().get()
         assertEquals("""{"recovered":true}""", result)
     }
 
@@ -150,7 +150,7 @@ class StorageManagerTest {
     fun updateSession_usesUpdateOperation() {
         val server = FakeServerHandler()
         val manager = StorageManager.createForTest(sessionId = sessionId(), serverHandler = server)
-        manager.updateSession("""{"v":2}""", null).get()
+        manager.updateSession("""{"v":2}""").get()
         assertEquals(listOf(StorageOperation.UPDATE), server.operations)
         assertEquals("""{"v":2}""", server.stored[manager.sessionId])
     }
@@ -167,7 +167,7 @@ class StorageManagerTest {
             localStorageHandler = local
         )
         runBlocking { local.storeData(manager.sessionId!!, """{"x":1}""") }
-        val ok = manager.invalidateSession(null).get()
+        val ok = manager.invalidateSession().get()
         assertTrue(ok)
         assertEquals(listOf(StorageOperation.INVALIDATE), server.operations)
         assertNull(manager.sessionId)
@@ -202,7 +202,7 @@ class StorageManagerTest {
             serverHandler = server,
             localStorageHandler = throwing
         )
-        val result = manager.createSession("""{"ok":true}""", null).get()
+        val result = manager.createSession("""{"ok":true}""").get()
         assertEquals(manager.sessionId, result)
         assertEquals("""{"ok":true}""", server.stored[manager.sessionId])
     }
@@ -218,7 +218,7 @@ class StorageManagerTest {
             localStorageHandler = throwing
         )
         server.stored[manager.sessionId!!] = """{"server":true}"""
-        val result = manager.authorizeSession("o", null).get()
+        val result = manager.authorizeSession().get()
         assertEquals("""{"server":true}""", result)
     }
 
@@ -226,7 +226,7 @@ class StorageManagerTest {
     fun checkSessionParams_throwsWhenMissing() {
         val manager = StorageManager.createForTest(serverHandler = FakeServerHandler())
         try {
-            manager.createSession("{}", null).get()
+            manager.createSession("{}").get()
             assertFalse("expected failure", true)
         } catch (e: ExecutionException) {
             assertTrue(e.cause?.message?.contains("Session id is required") == true)

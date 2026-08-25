@@ -53,7 +53,7 @@ class StorageManagerInstrumentedTest {
         )
 
         server.enqueue(MockResponse().setBody("{}").setResponseCode(200))
-        val created = manager.createSession(payload, context).get()
+        val created = manager.createSession(payload).get()
         assertEquals(manager.sessionId, created)
         val createReq = server.takeRequest()
         assertEquals("POST", createReq.method)
@@ -67,18 +67,18 @@ class StorageManagerInstrumentedTest {
         )
         // Local cache should hit without a second server call if we authorize immediately
         // after create (useLocalStorage=true stored the payload).
-        val authorized = manager.authorizeSession(context.packageName, context).get()
+        val authorized = manager.authorizeSession().get()
         assertEquals(payload, authorized)
         assertEquals(1, server.requestCount)
 
         server.enqueue(MockResponse().setBody("{}").setResponseCode(200))
-        manager.updateSession("""{"publicAddress":"0xdef"}""", context).get()
+        manager.updateSession("""{"publicAddress":"0xdef"}""").get()
         val updateReq = server.takeRequest()
         assertEquals("PUT", updateReq.method)
         assertTrue(updateReq.path!!.endsWith("/v2/store/update"))
 
         server.enqueue(MockResponse().setBody("{}").setResponseCode(200))
-        val invalidated = manager.invalidateSession(context).get()
+        val invalidated = manager.invalidateSession().get()
         assertTrue(invalidated)
         val invalidateReq = server.takeRequest()
         assertEquals("POST", invalidateReq.method)

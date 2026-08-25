@@ -40,7 +40,7 @@ class AuthSessionManager(
 ) : IHttpSessionAuthProvider {
 
     constructor(
-        apiClientConfig: ApiClientConfig? = null,
+        apiClientConfig: ApiClientConfig,
         storage: StorageConfig? = null,
         storageKeyPrefix: String = DEFAULT_STORAGE_KEY_PREFIX,
         accessTokenProvider: AccessTokenProvider? = null,
