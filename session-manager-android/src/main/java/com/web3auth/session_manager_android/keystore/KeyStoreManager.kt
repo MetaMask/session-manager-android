@@ -10,6 +10,7 @@ import org.bouncycastle.asn1.ASN1Integer
 import org.bouncycastle.asn1.DERSequence
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.util.encoders.Hex
+import com.web3auth.session_manager_android.util.HexUtils
 import org.web3j.crypto.ECKeyPair
 import org.web3j.crypto.Hash
 import org.web3j.crypto.Keys
@@ -87,17 +88,29 @@ object KeyStoreManager {
      * Get Public key from sessionID
      */
     fun getPubKey(sessionId: String): String {
-        val derivedECKeyPair: ECKeyPair = ECKeyPair.create(BigInteger(sessionId, 16))
+        val derivedECKeyPair: ECKeyPair = ECKeyPair.create(HexUtils.toBigInteger(sessionId))
         return derivedECKeyPair.publicKey.toString(16)
     }
 
     /**
-     * Generate temporary private and public key that is used to secure receive shares
+     * Uncompressed public key hex: `04` + 128-char X||Y, matching web `getPublic`.
+     */
+    fun getUncompressedPubKey(sessionId: String): String {
+        return "04" + getPubKey(sessionId).padStart(128, '0')
+    }
+
+    /**
+     * Generate temporary private and public key that is used to secure receive shares.
+     * Returns a 0x-prefixed 32-byte hex string to match web `bytesToHexPrefixedString`.
      */
     fun generateRandomSessionKey(): String {
         val tmpKey = Keys.createEcKeyPair()
-        return tmpKey.privateKey.toString(16).padStart(64, '0')
+        return HexUtils.add0x(tmpKey.privateKey.toString(16).padStart(64, '0'))
     }
+
+    fun isHexString(value: String): Boolean = HexUtils.isHexString(value)
+
+    fun padHexString(hexString: String): String = HexUtils.padHexString(hexString)
 
     /**
      * Initialize BouncyCastle for generation sessionId
